@@ -167,3 +167,5 @@ oc start-build openshift-tasks-pipeline -n cicd-dev
 
 #Create HPA for tasks-prod
 oc create -f /root/openshift-deployment/files/tasks-prod-hpa.yaml -n tasks-prod
+
+#end
