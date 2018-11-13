@@ -1,0 +1,20 @@
+---
+- hosts: all
+  tasks:
+    - name: Ping all hosts
+      ping: 
+
+- hosts: nodes
+  tasks:
+    - name: Verify Docker is running
+      script: /root/openshift-deployment/files/scripts/sanitycheckDocker.sh
+
+- hosts: nfs
+  tasks:
+    - name: Verify NFS export
+      script: /root/openshift-deployment/files/scripts/sanitycheckNFS.sh
+
+- hosts: localhost
+  tasks:
+    - name: Verify/update openshift files
+      script: /root/openshift-deployment/files/scripts/sanitycheckUpdates.sh

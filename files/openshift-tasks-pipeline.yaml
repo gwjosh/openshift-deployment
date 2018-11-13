@@ -1,0 +1,31 @@
+apiVersion: v1
+items:
+- kind: "BuildConfig"
+  apiVersion: "v1"
+  metadata:
+    name: "openshift-tasks-pipeline"
+  spec:
+    strategy:
+      type: "JenkinsPipeline"
+      jenkinsPipelineStrategy:
+        jenkinsfile: |
+          node {
+            stage ("BUILD") {
+                 openshiftBuild bldCfg: 'openshift-tasks', buildName: '', checkForTriggeredDeployments: 'false', commitID: '', namespace: 'tasks-build', showBuildLogs: 'false', verbose: 'false', waitTime: '120000'
+                 openshiftVerifyBuild apiURL: 'https://openshift.default.svc.cluster.local', authToken: '', bldCfg: 'openshift-tasks', checkForTriggeredDeployments: 'false', namespace: '', verbose: 'false'
+                 }
+            stage ("DEV") {
+                openshiftDeploy apiURL: 'https://openshift.default.svc.cluster.local', authToken: '', depCfg: 'openshift-tasks', namespace: 'tasks-dev', verbose: 'false', waitTime: ''
+                openshiftVerifyDeployment apiURL: 'https://openshift.default.svc.cluster.local', authToken: '', depCfg: 'openshift-tasks', namespace: 'tasks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '120000'
+                }
+            stage ("TEST") {
+                openshiftDeploy apiURL: 'https://openshift.default.svc.cluster.local', authToken: '', depCfg: 'openshift-tasks', namespace: 'tasks-test', verbose: 'false', waitTime: ''
+                openshiftVerifyDeployment apiURL: 'https://openshift.default.svc.cluster.local', authToken: '', depCfg: 'openshift-tasks', namespace: 'tasks-test', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '120000'
+                }
+            stage ("PROD") {
+                 openshiftDeploy apiURL: 'https://openshift.default.svc.cluster.local', authToken: '', depCfg: 'openshift-tasks', namespace: 'tasks-prod', verbose: 'false', waitTime: ''
+                 openshiftVerifyDeployment apiURL: 'https://openshift.default.svc.cluster.local', authToken: '', depCfg: 'openshift-tasks', namespace: 'tasks-prod', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '12000'
+                }
+          }
+kind: List
+metadata: {}

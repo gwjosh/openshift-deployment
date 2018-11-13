@@ -1,0 +1,22 @@
+---
+- hosts: masters
+  tasks:
+    - name: Update default project node placement
+      replace:
+        path: /etc/origin/master/master-config.yaml
+        regexp: '^  defaultNodeSelector:.*'
+        replace: '  defaultNodeSelector: client=common'
+        backup: yes
+    - name: Update default project template
+      replace:
+        path: /etc/origin/master/master-config.yaml
+        regexp: '^  projectRequestTemplate:.*'
+        replace: '  projectRequestTemplate: default/project-request'
+        backup: yes
+    - name: Restart Master API
+      shell: "/usr/local/bin/master-restart api"
+    - name: Restart Master Controllers
+      shell: "/usr/local/bin/master-restart controllers"
+    - name: Wait for services to restart 
+      pause:
+        minutes: 1

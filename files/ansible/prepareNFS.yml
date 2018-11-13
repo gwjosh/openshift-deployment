@@ -1,0 +1,10 @@
+---
+- hosts: nfs
+  tasks:
+    - name: Create NFS Folders
+      script: /root/openshift-deployment/files/scripts/createNFSFolders.sh
+
+- hosts: localhost
+  tasks:
+    - name: Create NFS PVs
+      script: /root/openshift-deployment/files/scripts/createNFSPVs.sh
