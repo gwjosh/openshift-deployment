@@ -53,15 +53,18 @@ echo "Preparing NFS PVs..."
 ansible-playbook -i /etc/ansible/hosts /root/openshift-deployment/files/ansible/prepareNFS.yml
 
 #Set default project template
-##Limit per node 2CPU and 8GB RAM
+##Limit per node 2CPU and 4GB RAM
+echo "Creating default project template..."
 oc create -f /root/openshift-deployment/files/template.yaml -n default
 
 #Remove self-provisioning from non-admins
+echo "Preventing non-admin self provisiing..."
 oc patch clusterrolebinding.rbac self-provisioners -p '{"subjects": null}'
 oc patch clusterrolebinding.rbac self-provisioners -p '{ "metadata": { "annotations": { "rbac.authorization.kubernetes.io/autoupdate": "false" } } }'
 
 ###Set up multi tenancy###
 #tag nodes client=alpha, client=beta, client=common, env=infra
+echo "Configuring multitennent node tags..."
 oc label node infranode1.$GUID.internal env=infra
 oc label node infranode2.$GUID.internal env=infra
 oc label node node1.$GUID.internal client=alpha
@@ -70,9 +73,11 @@ oc label node node3.$GUID.internal client=common
 oc label node node4.$GUID.internal client=common
 
 #Set default node selector for new projects to client=common
+echo "Setting default node selector..."
 ansible-playbook -i /etc/ansible/hosts /root/openshift-deployment/files/ansible/updateMasters.yml
 
 #Copy updated htpasswd file to masters
+echo "Creating users..."
 ansible masters -m copy -a "src=/root/openshift-deployment/files/htpasswd dest=/etc/origin/master/htpasswd"
 
 #create brian
@@ -122,6 +127,7 @@ oc new-app nodejs-mongo-persistent -n nodejs-demo01
 
 ##Create CICD Environment
 #Create CICD Projects
+echo "Creating CICD Environment..."
 oc new-project cicd-dev
 oc new-project tasks-build
 oc new-project tasks-dev
@@ -163,9 +169,12 @@ oc create -f /root/openshift-deployment/files/openshift-tasks-pipeline.yaml -n c
 sleep 600
 
 #Start build
+echo "Kicking off CICD build..."
 oc start-build openshift-tasks-pipeline -n cicd-dev
 
 #Create HPA for tasks-prod
+echo "Create tasks-prod HPA..."
 oc create -f /root/openshift-deployment/files/tasks-prod-hpa.yaml -n tasks-prod
 
+echo "Deployment complete!"
 #end
