@@ -5,10 +5,14 @@ deployment there will be a functional test environment with internal and client 
 applications deployed.
 
 Requirements:
+
 • A POC environment with 3 master nodes, 2 infra nodes, 1 support node, 1 bastion node and 4 compute
 nodes.
+
 • Ansible installed on all nodes
+
 • Docker installed on all nodes
+
 • Access to a Red Hat Registry Service Account (you will be prompted for credentials)
 
 Deploying Environment:
